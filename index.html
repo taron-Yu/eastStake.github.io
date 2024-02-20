@@ -1,0 +1,530 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!DOCTYPE html>
+<html lang="ko">
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width">
+<meta name="keyword" content="대진표 매니저, 대회 개설, 대진표 생성, 대진표매니저, 대진표, 토너먼트대진표, 대진표만들기, 대진표프로그램, 토너먼트프로그램, 리그대진표, 대진표양식, 경기대진표, 대진표사이트">
+<meta name="description" content="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta name="title" content="대진표 매니저">
+<!-- og tag 정책 (facebook, kakaotalk) -->
+<meta property="og:url" content="https://bracket.smilegatemegaport.com">
+<meta property="og:type" content="website">
+<meta property="og:title" content="대진표 매니저">
+<meta property="og:description" content="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta property="og:image" content="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/tag_800x400.jpg?20230912135919">
+<!-- //og tag 정책 (facebook, kakaotalk) -->
+<!-- twitter tag 정책 -->
+<meta property="twitter:card" value="summary">
+<meta property="twitter:title" value="대진표 매니저">
+<meta property="twitter:description" value="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta property="twitter:image" value="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/tag_600x600.jpg?20230912135919">
+<!-- //twitter tag 정책 -->
+<title>대진표 매니저</title>
+<!-- declare uri -->
+    <link rel="shortcut icon" href="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/favicon.ico?20230912135919">
+    
+    <link rel="stylesheet" href="https://pcbimg.smilegatemegaport.com/resources/bracket/css/style.css?20230912135919">
+    <script type="text/javascript" src="https://pcbimg.smilegatemegaport.com/resources/bracket/js/plugins.js?20230912135919"></script>
+    <script type="text/javascript" src="https://pcbimg.smilegatemegaport.com/resources/bracket/js/ui.js?20230912135919"></script>
+    
+
+<!-- //Declare -->
+<!-- Util -->
+<!DOCTYPE html>
+<html lang="ko">
+<script async src=https://www.googletagmanager.com/gtag/js?id=UA-220104389-1></script><!-- Global site tag (gtag.js) - Google Analytics -->
+<script type="text/javascript">
+    // Google Analytics
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-220104389-1');
+
+    // 빈 값 체크
+    const isEmpty = (val) => {
+        if(val == null)         return true;            // Null
+        if(Array.isArray(val))  return val.length == 0; // List
+        return val == "";                               // String
+    }
+
+    // HTML 태그 치환
+    const checkHtmlTag = (_str) => {
+        return _str.replace(/(<([^>]+)>)/gi, '');
+    }
+
+    // 정규식 체크
+    const checkRegExp = (_regExp, _str) => {
+        let regExp = "";
+
+        const regExpNo = /[0-9]/g;            // 숫자
+        const regExpNoOnly = /^[0-9]*$/;      // 숫자만
+        const regExpKo = /[ㄱ-ㅎㅏ-ㅣ가-힣]/g;  // 한글
+        const regExpEn = /[A-Za-z]/g;         // 영문
+        const regExpNc = /.*[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9|\s]+.*/; // 한글, 영문, 숫자 가능(공백 허용)
+        const regExpSc = /^[~!@#$%^&*\(\)_\-+\=\{\}\[\]|\\:;\"\'<>,.?※《》☆★○●◎◇◆□■△▲▽▼→←↑↓〓◁◀▷▶♤♠♡♥♧♣⊙◈▣◐◑♨☏☎☜☞♩♪♬㈜]/gi;
+        const regExpGn = /^[0-9|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]+$/; // 한글, 숫자만 가능(공백 허용)
+        const regExpTot = /^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9|\s|~!@#$%^&*\(\)_\-+\=\{\}\[\]|\\\/:;\"\'<>,.?※《》☆★○●◎◇◆□■△▲▽▼→←↑↓〓◁◀▷▶♤♠♡♥♧♣⊙◈▣◐◑♨☏☎☜☞♩♪♬㈜]*$/;    // 한글, 영문, 숫자, 특문 가능(공백 허용)
+
+        switch (_regExp) {
+            case "no"    : regExp = regExpNo;       break;
+            case "noOnly": regExp = regExpNoOnly;   break;
+            case "ko"    : regExp = regExpKo;       break;
+            case "en"    : regExp = regExpEn;       break;
+            case "nc"    : regExp = regExpNc;       break;
+            case "sc"    : regExp = regExpSc;       break;
+            case "gn"    : regExp = regExpGn;       break;
+            case "tot"   : regExp = regExpTot;      break;
+        }
+
+        return regExp.test(_str) ? true : false;
+    }
+
+    // Get Bytes
+    const getBytes = (_str) => {
+        const stringByteLength = (function(s, b, i, c) {
+            for(b = i = 0; c = s.charCodeAt(i++); b += c >> 11 ? 3 : c >> 7 ? 2 : 1);
+            return b
+        })(_str);
+        return stringByteLength;
+    }
+
+    // Byte 체크
+    const checkBytes = (str, maxLength, inputFieldId, bytesFieldId) => {
+        let strLength = 0;
+        let strTitle = "";
+        let strPiece = "";
+
+        for (let i = 0; i < str.length; i++) {
+            let code = str.charCodeAt(i);
+            const ch = str.substr(i, 1).toUpperCase();
+
+            // 체크 하는 문자를 저장
+            strPiece = str.substr(i, 1)
+            code = parseInt(code);
+
+            // UTF-8 3byte로 계산
+            strLength += ((ch < "0" || ch > "9") && (ch < "A" || ch > "Z") && ((code > 255) || (code < 0))) ? 3 : 1;
+
+            if(strLength > maxLength) {  // 제한길이 확인
+                strLength = maxLength;
+                break;
+            } else {
+                strTitle += strPiece; // 제한길이 보다 작으면 자른 문자를 붙여준다.
+            }
+        }
+
+        $(`#${inputFieldId}`).val(strTitle);
+        $(`#${bytesFieldId}`).text(strLength);
+    }
+
+    // Go Step(with bracketSeq)
+    const goStep = (action, method, param) => {
+        const paramForm = document.createElement("form");
+        paramForm.setAttribute("action", action);
+        paramForm.setAttribute("method", method);
+
+        const hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "bracketSeq");
+        hiddenField.setAttribute("value", param);
+        paramForm.appendChild(hiddenField);
+
+        document.body.appendChild(paramForm);
+        paramForm.submit();
+    }
+
+    // HTML 태그 변환
+    const convertToHtml = (contents) => {
+        if(isEmpty(contents))   return contents;
+
+        if(contents.indexOf("&lt;") > -1)   contents = contents.replaceAll("&lt;", "<");
+        if(contents.indexOf("&gt;") > -1)   contents = contents.replaceAll("&gt;", ">");
+        if(contents.indexOf("&amp;") > -1)  contents = contents.replaceAll("&amp;", "&");
+        if(contents.indexOf("\t") > -1)     contents = contents.replaceAll("\t", "&nbsp;");
+        //if(contents.indexOf(" ") > -1)      contents = contents.replaceAll(" ", "&nbsp;");
+
+        return contents;
+    }
+
+    // 공통 Ajax
+    const commonAjax = (paramUrl, paramType, paramData, paramFunction, paramNoOptYn, paramDataType) => {
+        const successFunction = function(data) {
+            if("OK" == data.code) {
+                paramFunction(data);
+            } else if("" != data.code) {
+                alert(data.message);
+                return false;
+            } else {
+                alert("요청 중 오류가 발생하였습니다.");
+                console.log(`[${data.code}] ${data.message}`);
+            }
+        };
+
+        const errorFunction = function(e) {
+            alert("요청 중 오류가 발생하였습니다.");
+            console.log(e);
+        };
+
+        if(paramNoOptYn) {
+            if('html' == paramDataType) {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    dataType: paramDataType,
+                    success: function (data) { paramFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            } else if('auth' == paramDataType) {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    success: function (data) { paramFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            } else {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    success: function (data) { successFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            }
+        } else {
+            $.ajax({
+                url: paramUrl, type: paramType, data: paramData,
+                processData: false, contentType: false,
+                success: function (data) { successFunction(data); },
+                error: function (e) { errorFunction(e); }
+            });
+        }
+    }
+
+    // px 제거 값 조회
+    function getRemovePixel(val) {
+        return Number(val.substring(0, val.indexOf('px')));
+    }
+</script>
+<!-- //Util -->
+    <script type="text/javascript">
+        // 검색조건 선택
+        function selectSearchType(searchType) {
+            const searchForm = $("form[name=searchForm]");
+            const searchTypeTxt = searchType == 'bracketCode' ? '대회코드' : (searchType == 'gameName' ? '게임명' : '대회명');
+
+            searchForm.find("button[name=selSearchType]").text(searchTypeTxt);
+            searchForm.find("input[name=searchType]").val(searchType);
+        }
+
+        // 고도화 : 필터링 선택
+        function setMatchStatus(matchStatus) {
+            const btnSelFilter = $(`#filterWrap li[data-value=${"" == matchStatus ? "T" : matchStatus}]`);
+            if(btnSelFilter.hasClass('current')) {
+                return false;
+            }
+
+            const searchForm = $("form[name=searchForm]");
+            const searchType = searchForm.find('input[name=searchType]').val();
+            const keyword = searchForm.find('input[name=keyword]').val();
+
+            searchForm.find('input[name=matchStatus]').val(matchStatus);
+            searchForm.find('input[name=currentPage]').val(1);
+            const currentPage = Number(searchForm.find('input[name=currentPage]').val());
+
+            commonAjax('/bracket/list', 'post', { searchType : searchType, keyword : keyword, matchStatus: matchStatus, currentPage : currentPage }, function(data) {
+                $("#matchList").html(`<tr>${data}</tr>`);    // <tr> 못 불러오는 이슈로 하드코딩 추가
+                $(`#filterWrap li`).removeClass('current');
+                btnSelFilter.addClass('current');
+            }, true, 'html');
+        }
+
+        // 대회목록 더보기
+        function moreBracketList() {
+            const searchForm = $("form[name=searchForm]");
+
+            const searchType = searchForm.find('input[name=searchType]').val();
+            const keyword = searchForm.find('input[name=keyword]').val();
+            const matchStatus = searchForm.find('input[name=matchStatus]').val();
+
+            searchForm.find('input[name=currentPage]').val(Number(searchForm.find('input[name=currentPage]').val()) + 1);
+            const currentPage = Number(searchForm.find('input[name=currentPage]').val());
+
+            commonAjax('/bracket/list', 'post', { searchType : searchType, keyword : keyword, matchStatus: matchStatus, currentPage : currentPage }, function(data) {
+                $("#matchList").append(`<tr>${data}</tr>`);    // <tr> 못 불러오는 이슈로 하드코딩 추가
+            }, true, 'html');
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <!DOCTYPE html>
+<html lang="ko">
+
+<script type="text/javascript">
+    // 대회 검색
+    function searchBracket() {
+        const searchForm = $("form[name=searchForm]");
+        const keyword = searchForm.find('input[name=keyword]').val();
+
+        if(!isEmpty(keyword)) {
+            if(!checkRegExp("tot", keyword)) {
+                alert('검색어에 사용할 수 없는 문자가 있습니다.\n확인 후 다시 입력해주세요.');
+                return false;
+            }
+
+            if(keyword.length < 2 || getBytes(keyword) > 50) {
+                alert('최소 2자 이상 50Byte 이하 입력 해주세요.');
+                return false;
+            }
+        }
+
+        searchForm.find("input[name=currentPage]").val(1);
+        searchForm.submit();
+    }
+</script>
+
+<!-- header -->
+
+    <header id="header" class="main">
+        <div class="inner flex">
+            <h1><a href="/index" class="bi">스마일게이트 PC방 대진표 매니저</a></h1>
+            <!-- gnb -->
+            <nav class="gnb-wrap">
+                <ul class="flex">
+                    <li id="navHome" class="current"><a href="/index">홈</a></li>
+                    <li id="navMatch"><a href="/match/basic">대회 개설</a></li>
+                    <li id="navDraw"><a href="/bracket/main">대회 관리</a></li>
+                    <li class="depth2" id="navCs">
+                        <a href="/cs/notice/list">공지/안내</a>
+                        <ul>
+                            <li id="navNotice"><a href="/cs/notice/list">공지사항</a></li>
+                            <li id="navGuide"><a href="/cs/service/guide">서비스 안내</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+
+            
+        </div>
+    </header>
+
+<!-- //header -->
+
+        <!-- container -->
+        <div id="container" class="main">
+            <div class="top-section">
+                <div class="inner">
+                    <span class="bi-tournament"><span >대진표 매니저</span></span>
+
+                    <!-- 검색 폼 -->
+                    <form name="searchForm" method="post"><!-- 'form' 공통 클래스 + 개별 attr 값 -->
+                        <div class="form" data-id="tournament">
+                            <div class="selectbox">
+                                <button type="button" class="selectbox-header" name="selSearchType">대회명</button>
+                                
+                                
+                                <div class="selectbox-body">
+                                    <ul>
+                                        <li onclick="selectSearchType('bracketTitle');"><button type="button">대회명</button></li>
+                                        <li onclick="selectSearchType('bracketCode');"><button type="button">대회코드</button></li>
+                                        <li onclick="selectSearchType('gameName');"><button type="button">게임명</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <input type="search" name="keyword" class="input-search" placeholder="" value="" onkeydown="if(event.keyCode==13) { searchBracket(); return false; }">
+                            <button type="button" class="btn" onclick="searchBracket();"><i class="ico ico-searchbtn">검색</i></button>
+                            <input type="hidden" name="searchType" value="bracketTitle" />
+                            <input type="hidden" id="currentPage" name="currentPage" value="1" />
+                            <input type="hidden" name="matchStatus" value="" />
+                        </div>
+                    </form>
+                    <!-- //검색 폼 -->
+                </div>
+            </div>
+
+            <!-- contents -->
+            <div class="contents">
+                <!-- 대회 개설 -->
+                <div class="match-open flex">
+                    <p><strong>대회를 개설하고</strong> 직접 대회를 운영해보세요.</p>
+                    <button type="button" class="btn btn-default" onclick="location.href='/match/basic'"><span>대회 개설하기</span></button>
+                    <a href="/cs/service/guide" target="_blank" class="btn btn-default btn-white" id="btnGuide"><span>개설 가이드</span></a>
+                </div>
+                <!-- //대회 개설 -->
+
+                <!-- 대회 목록 -->
+                <div class="tbl-area" id="matchListWrap">
+                    <!-- 고도화 : 필터링 추가 -->
+                    <div class="tab-area" data-tab-type="type2">
+                        <ul class="tab" id="filterWrap">
+                            <li data-value="T"  onclick="setMatchStatus('');" class="current"><a href="#"><span>전체</span></a></li>
+                            <li data-value="R"  onclick="setMatchStatus('R');"><a href="#"><span>모집중</span></a></li>
+                            <li data-value="PR" onclick="setMatchStatus('PR')"><a href="#"><span>모집 준비중</span></a></li>
+                            <li data-value="PM" onclick="setMatchStatus('PM')"><a href="#"><span>대회 준비중</span></a></li>
+                            <li data-value="M"  onclick="setMatchStatus('M');"><a href="#"><span>대회중</span></a></li>
+                            <li data-value="F"  onclick="setMatchStatus('F');"><a href="#"><span>대회 종료</span></a></li>
+                        </ul>
+                    </div>
+                    <!-- //고도화 : 필터링 추가 -->
+                    <div class="tbl-list-nodata flex" id="tblNoData" style="display: none;">
+                        <p>지금 대회를 개설해보세요!</p>
+                        
+                    </div>
+                    
+                        <table class="tbl tbl-list" id="tblMatchList">
+                            <caption>대회 목록</caption>
+                            <colgroup>
+                                <col width="136px">
+                                <col width="*">
+                                <col width="140px">
+                                <col width="225px">
+                                <col width="130px">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">상태</th>
+                                    <th scope="col">대회명</th>
+                                    <th scope="col">대회일정</th>
+                                    <th scope="col">게임명</th>
+                                    <th scope="col">대진표보기</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matchList"><!-- 5개씩 확장 -->
+                                <!DOCTYPE html>
+<html lang="ko">
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            /*<![CDATA[*/
+            const currentPage = 1;
+            let searchType = 'bracketTitle';
+            let keyword = '';
+            /*]]*/
+            // 더보기 버튼 숨김 여부
+            const searchForm = $("form[name=searchForm]");
+            searchForm.find("input[name=currentPage]").val(currentPage);
+            $("button[name=btnMore]").css('display', ("Y" == 'N') ? 'block' : 'none');
+
+            // 검색어 하이라이트
+            if(searchType == "bracketTitle" && keyword != '') {
+                const regExpKeyword = new RegExp(keyword, 'i');
+                keyword = keyword.replace(regExpKeyword, keyword.toUpperCase());
+                $(".uc-bracket-title").each(function() {
+                    const title = $(this).text();
+                    if(title.replace(new RegExp(title,'i'), title.toUpperCase()).indexOf(keyword) > -1) {
+                        $(this).html($(this).text().replace(regExpKeyword, "<i class='highlighting'>" + title.match(regExpKeyword)[0] + "</i>"));
+                    }
+                });
+            }
+
+            // 검색 조건 및 검색어 세팅
+            searchForm.find("input[name=keyword]").val(keyword);
+            if(isEmpty(searchType)) searchType = "bracketTitle";
+            selectSearchType(searchType);
+            $('#tblNoData').css('display', 'none');
+            $('#tblMatchList').css('display', '');
+        });
+    </script>
+
+    <!-- page : 1 -->
+    <tr>
+        
+        <td><i class="ico-state on">대회중</i></td>
+        
+        
+        
+        
+        <td class="t-left">
+            <a href="#" class="ellipsis uc-bracket-title" onclick="location.href=&#39;/bracket/main?bracketSeq=211&#39;;">
+                ㅇㄹㅇ
+            </a>
+        </td>
+        <td>2월 16일 10:00</td>
+        <td>테일즈런너</td>
+        <td>
+            <button type="button" class="btn btn-default btn-s btn-white" onclick="location.href=&#39;/bracket/main?bracketSeq=211&#39;;"><span>대진표</span></button>
+            
+        </td>
+    </tr>
+    <tr>
+        
+        
+        
+        
+        <td><i class="ico-state complete">대회 종료</i></td>
+        
+        <td class="t-left">
+            <a href="#" class="ellipsis uc-bracket-title" onclick="location.href=&#39;/bracket/main?bracketSeq=209&#39;;">
+                광명시장배
+            </a>
+        </td>
+        <td>2월 10일 13:00</td>
+        <td>리그오브레전드</td>
+        <td>
+            <button type="button" class="btn btn-default btn-s btn-white" onclick="location.href=&#39;/bracket/main?bracketSeq=209&#39;;"><span>대진표</span></button>
+            
+        </td>
+    </tr>
+    <!-- //page : 1 -->
+
+</html>
+                            </tbody>
+                        </table>
+                    
+                </div>
+                <div class="btn-area">
+                    
+                    <button type="button" name="btnMore" class="btn btn-default btn-s btn-white btn-more-list" style="display: none;"><span>더보기</span></button>
+                </div>
+                <!-- //대회 목록 -->
+
+                <!-- 공지사항 롤링 배너 -->
+                
+                    <article class="notice-list flex">
+                        <div class="swiper-container" data-swiper-id="notice">
+                            <div class="swiper-wrapper">
+                                
+                                    <div class="swiper-slide">
+                                        <a href="#" class="ellipsis" onclick="location.href=&#39;/cs/notice/view?noticeSeq=9&#39;;">
+                                            [안내] 대진표 매니저 기능 관련 문의처
+                                        </a>
+                                    </div>
+                                
+                                    <div class="swiper-slide">
+                                        <a href="#" class="ellipsis" onclick="location.href=&#39;/cs/notice/view?noticeSeq=1&#39;;">
+                                            [안내] 대진표 매니저 서비스 오픈
+                                        </a>
+                                    </div>
+                                
+                            </div>
+                        </div>
+                    </article>
+                
+                <!-- //공지사항 롤링 배너 -->
+            </div>
+            <!-- //contents -->
+        </div>
+        <!-- //container -->
+
+        <!DOCTYPE html>
+<html lang="ko">
+
+<!-- footer -->
+<footer id="footer">
+    <p class="inner">
+        대진표 매니저는 스마일게이트홀딩스에서 무상으로 지원되고 있는 서비스 입니다.
+        <br>대회 참가 및 운영 관련 문의는 대회 개최자 및 관리자에게 문의하여 주세요.
+        <br>대회 개설 및 대진표 생성 기능 관련 문의는 <span onclick="location.href='mailto:sgpcb@smilegate.com'">sgpcb@smilegate.com</span>으로 문의하여 주세요.
+    </p>
+    <p class="copyright">
+        <span>&copy; Smilegate. All Rights Reserved.</span>
+    </p>
+</footer>
+<!-- //footer -->
+    </div>
+</body>
+</html>
