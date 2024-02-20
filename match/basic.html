@@ -1,0 +1,770 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!DOCTYPE html>
+<html lang="ko">
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="format-detection" content="telephone=no">
+<meta name="viewport" content="width=device-width">
+<meta name="keyword" content="대진표 매니저, 대회 개설, 대진표 생성, 대진표매니저, 대진표, 토너먼트대진표, 대진표만들기, 대진표프로그램, 토너먼트프로그램, 리그대진표, 대진표양식, 경기대진표, 대진표사이트">
+<meta name="description" content="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta name="title" content="대진표 매니저">
+<!-- og tag 정책 (facebook, kakaotalk) -->
+<meta property="og:url" content="https://bracket.smilegatemegaport.com">
+<meta property="og:type" content="website">
+<meta property="og:title" content="대진표 매니저">
+<meta property="og:description" content="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta property="og:image" content="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/tag_800x400.jpg?20230912135919">
+<!-- //og tag 정책 (facebook, kakaotalk) -->
+<!-- twitter tag 정책 -->
+<meta property="twitter:card" value="summary">
+<meta property="twitter:title" value="대진표 매니저">
+<meta property="twitter:description" value="대진표 매니저 서비스를 통해 대회를 운영해보세요! 회원가입 없이 대회 페이지 및 대진표 생성 기능을 무료 제공합니다.">
+<meta property="twitter:image" value="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/tag_600x600.jpg?20230912135919">
+<!-- //twitter tag 정책 -->
+<title>대진표 매니저</title>
+<!-- declare uri -->
+    <link rel="shortcut icon" href="https://pcbimg.smilegatemegaport.com/resources/bracket/images/common/favicon.ico?20230912135919">
+    
+    <link rel="stylesheet" href="https://pcbimg.smilegatemegaport.com/resources/bracket/css/style.css?20230912135919">
+    <script type="text/javascript" src="https://pcbimg.smilegatemegaport.com/resources/bracket/js/plugins.js?20230912135919"></script>
+    <script type="text/javascript" src="https://pcbimg.smilegatemegaport.com/resources/bracket/js/ui.js?20230912135919"></script>
+    
+
+<!-- //Declare -->
+<!-- Util -->
+<!DOCTYPE html>
+<html lang="ko">
+<script async src=https://www.googletagmanager.com/gtag/js?id=UA-220104389-1></script><!-- Global site tag (gtag.js) - Google Analytics -->
+<script type="text/javascript">
+    // Google Analytics
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-220104389-1');
+
+    // 빈 값 체크
+    const isEmpty = (val) => {
+        if(val == null)         return true;            // Null
+        if(Array.isArray(val))  return val.length == 0; // List
+        return val == "";                               // String
+    }
+
+    // HTML 태그 치환
+    const checkHtmlTag = (_str) => {
+        return _str.replace(/(<([^>]+)>)/gi, '');
+    }
+
+    // 정규식 체크
+    const checkRegExp = (_regExp, _str) => {
+        let regExp = "";
+
+        const regExpNo = /[0-9]/g;            // 숫자
+        const regExpNoOnly = /^[0-9]*$/;      // 숫자만
+        const regExpKo = /[ㄱ-ㅎㅏ-ㅣ가-힣]/g;  // 한글
+        const regExpEn = /[A-Za-z]/g;         // 영문
+        const regExpNc = /.*[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9|\s]+.*/; // 한글, 영문, 숫자 가능(공백 허용)
+        const regExpSc = /^[~!@#$%^&*\(\)_\-+\=\{\}\[\]|\\:;\"\'<>,.?※《》☆★○●◎◇◆□■△▲▽▼→←↑↓〓◁◀▷▶♤♠♡♥♧♣⊙◈▣◐◑♨☏☎☜☞♩♪♬㈜]/gi;
+        const regExpGn = /^[0-9|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\s]+$/; // 한글, 숫자만 가능(공백 허용)
+        const regExpTot = /^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|a-z|A-Z|0-9|\s|~!@#$%^&*\(\)_\-+\=\{\}\[\]|\\\/:;\"\'<>,.?※《》☆★○●◎◇◆□■△▲▽▼→←↑↓〓◁◀▷▶♤♠♡♥♧♣⊙◈▣◐◑♨☏☎☜☞♩♪♬㈜]*$/;    // 한글, 영문, 숫자, 특문 가능(공백 허용)
+
+        switch (_regExp) {
+            case "no"    : regExp = regExpNo;       break;
+            case "noOnly": regExp = regExpNoOnly;   break;
+            case "ko"    : regExp = regExpKo;       break;
+            case "en"    : regExp = regExpEn;       break;
+            case "nc"    : regExp = regExpNc;       break;
+            case "sc"    : regExp = regExpSc;       break;
+            case "gn"    : regExp = regExpGn;       break;
+            case "tot"   : regExp = regExpTot;      break;
+        }
+
+        return regExp.test(_str) ? true : false;
+    }
+
+    // Get Bytes
+    const getBytes = (_str) => {
+        const stringByteLength = (function(s, b, i, c) {
+            for(b = i = 0; c = s.charCodeAt(i++); b += c >> 11 ? 3 : c >> 7 ? 2 : 1);
+            return b
+        })(_str);
+        return stringByteLength;
+    }
+
+    // Byte 체크
+    const checkBytes = (str, maxLength, inputFieldId, bytesFieldId) => {
+        let strLength = 0;
+        let strTitle = "";
+        let strPiece = "";
+
+        for (let i = 0; i < str.length; i++) {
+            let code = str.charCodeAt(i);
+            const ch = str.substr(i, 1).toUpperCase();
+
+            // 체크 하는 문자를 저장
+            strPiece = str.substr(i, 1)
+            code = parseInt(code);
+
+            // UTF-8 3byte로 계산
+            strLength += ((ch < "0" || ch > "9") && (ch < "A" || ch > "Z") && ((code > 255) || (code < 0))) ? 3 : 1;
+
+            if(strLength > maxLength) {  // 제한길이 확인
+                strLength = maxLength;
+                break;
+            } else {
+                strTitle += strPiece; // 제한길이 보다 작으면 자른 문자를 붙여준다.
+            }
+        }
+
+        $(`#${inputFieldId}`).val(strTitle);
+        $(`#${bytesFieldId}`).text(strLength);
+    }
+
+    // Go Step(with bracketSeq)
+    const goStep = (action, method, param) => {
+        const paramForm = document.createElement("form");
+        paramForm.setAttribute("action", action);
+        paramForm.setAttribute("method", method);
+
+        const hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "bracketSeq");
+        hiddenField.setAttribute("value", param);
+        paramForm.appendChild(hiddenField);
+
+        document.body.appendChild(paramForm);
+        paramForm.submit();
+    }
+
+    // HTML 태그 변환
+    const convertToHtml = (contents) => {
+        if(isEmpty(contents))   return contents;
+
+        if(contents.indexOf("&lt;") > -1)   contents = contents.replaceAll("&lt;", "<");
+        if(contents.indexOf("&gt;") > -1)   contents = contents.replaceAll("&gt;", ">");
+        if(contents.indexOf("&amp;") > -1)  contents = contents.replaceAll("&amp;", "&");
+        if(contents.indexOf("\t") > -1)     contents = contents.replaceAll("\t", "&nbsp;");
+        //if(contents.indexOf(" ") > -1)      contents = contents.replaceAll(" ", "&nbsp;");
+
+        return contents;
+    }
+
+    // 공통 Ajax
+    const commonAjax = (paramUrl, paramType, paramData, paramFunction, paramNoOptYn, paramDataType) => {
+        const successFunction = function(data) {
+            if("OK" == data.code) {
+                paramFunction(data);
+            } else if("" != data.code) {
+                alert(data.message);
+                return false;
+            } else {
+                alert("요청 중 오류가 발생하였습니다.");
+                console.log(`[${data.code}] ${data.message}`);
+            }
+        };
+
+        const errorFunction = function(e) {
+            alert("요청 중 오류가 발생하였습니다.");
+            console.log(e);
+        };
+
+        if(paramNoOptYn) {
+            if('html' == paramDataType) {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    dataType: paramDataType,
+                    success: function (data) { paramFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            } else if('auth' == paramDataType) {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    success: function (data) { paramFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            } else {
+                $.ajax({
+                    url: paramUrl, type: paramType, data: paramData,
+                    success: function (data) { successFunction(data); },
+                    error: function (e) { errorFunction(e); }
+                });
+            }
+        } else {
+            $.ajax({
+                url: paramUrl, type: paramType, data: paramData,
+                processData: false, contentType: false,
+                success: function (data) { successFunction(data); },
+                error: function (e) { errorFunction(e); }
+            });
+        }
+    }
+
+    // px 제거 값 조회
+    function getRemovePixel(val) {
+        return Number(val.substring(0, val.indexOf('px')));
+    }
+</script>
+<!-- //Util -->
+
+    <script>
+        $(document).ready(function() {
+            /*<![CDATA[*/
+            const bracketCode = null;
+            const gameCode = null;
+            const openYn = null == null ? "Y" : null;
+            /*]]*/
+
+            // 대회 제목이 있을 경우 바이트 세팅
+            checkBytes($('input[name=bracketTitle]').val(), 50, 'bracketTitle', 'bracketTitleBytes');
+
+            // 비공개 시 노출 영역
+            if("N" == openYn)   $("input[name=privatePwd]").val('');
+            $('#openYn').val(openYn);
+
+            // 신규 생성 시 진입 시 자동 생성
+            if(isEmpty(bracketCode))    makeIdAuto();
+
+            // 직접 입력한 게임이 아닐 경우 검색용 게임 목록 숨김
+            $('#gameName').prop('readonly', (gameCode != null && 'G9999' != gameCode) ? true : false);
+            $('#searchGameList').css('display', 'none');
+        });
+
+        // 대회 코드 자동 생성
+        function makeIdAuto() {
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+            const stringLength = 7;
+            let randomstring = '';
+
+            for(let i = 0; i < stringLength; i++) {
+                randomstring += chars.substr(Math.floor(Math.random() * chars.length), 1);
+            }
+
+            commonAjax('/match/check/duplicate/code', 'get', { bracketCode : randomstring }, function(data) {
+                if("OK" == data.code) {
+                    $('input[name=bracketCode]').val(data.bracketCode);
+                } else if("EXPECTATION_FAILED" != data.code) { // 이미 사용중
+                    makeIdAuto();
+                    return false;
+                } else {
+                    alert("요청 중 오류가 발생하였습니다.");
+                    console.log(`[${data.code}] ${data.message}`);
+                }
+            }, true, 'auth');
+        }
+
+        // 게임명 선택
+        function selectGame(_this) {
+            const gameCode = _this.attr('value');
+            const gameName = _this.children('button').text();
+
+            $('#gameName').val('');
+            $('input[name=gameName]').val('');
+            $('input[name=gameCode]').val(gameCode);
+
+            $('#gameName').val('');
+            $('.search-gamelist').css('display', 'none');
+
+            if('G9999' != gameCode) {
+                $('.selectbox-header').text(gameName);
+                $('#gameName').prop('readonly', true);
+            } else {
+                $('#gameName').prop('readonly', false);
+            }
+        }
+
+        // 게임명 검색
+        function searchGameName() {
+            const gameName = document.getElementById("gameName").value.toUpperCase();
+
+            if(gameName.length > 0) {
+                $('.search-gamelist').css('display', 'block');
+                const item = document.getElementsByClassName("item");
+
+                for(let i = 0; i < item.length; i++) {
+                    const name = item[i].getElementsByClassName("name");
+                    item[i].style.display = name[0].innerHTML.toUpperCase().indexOf(gameName) > -1 ? "flex" : "none";
+                }
+            } else {
+                $('.search-gamelist').css('display', 'none');
+            }
+        }
+
+        // 대회 관리자 비밀번호 유효성 체크
+        function checkValidationAdminPwd(adminPwd) {
+            //= 대회 관리자 비밀번호를 입력해주세요.
+            if("" == adminPwd)  return false;
+
+            //= 대회 관리자 비밀번호는 최소 6자리 이상, 최대 10자리까지 입력해주세요.
+            if(adminPwd.length < 6 || adminPwd.length > 10) return false;
+
+            //= 대회 관리자 비밀번호는 영문, 숫자를 조합해 구성해주세요.
+            if(!(checkRegExp('en', adminPwd) && checkRegExp('no', adminPwd)))   return false;
+
+            return true;
+        }
+
+        // 대회 관리자 비밀번호 유효성 체크
+        function checkValidationConfirmAdminPwd(confirmAdminPwd) {
+            return confirmAdminPwd == $('#adminPwd').val(); //= 대회 관리자 비밀번호 확인이 일치하지 않습니다.
+        }
+
+        // 비공개 대회 비밀번호 유효성 체크
+        function checkValidationPrivatePwd(privatePwd) {
+            //= 비공개 대회 비밀번호를 입력해주세요.
+            if("" == privatePwd)                    return false;
+
+            //= 비공개 대회 비밀번호는 6자리로 입력해주세요.
+            if(privatePwd.length != 6)              return false;
+
+            //= 비공개 대회 비밀번호는 숫자로만 구성해주세요.
+            if(!checkRegExp('noOnly', privatePwd))  return false;
+
+            return true;
+        }
+
+        // 공개 여부 세팅
+        function clickOpenYn(_this) {
+            $("input:radio[name=rdOpenYn]").removeAttr('checked');
+            _this.prop("checked", true);
+
+            const openYn = _this.val();
+            $("#openYn").val(openYn);
+
+            if("N" == openYn) {
+                $("input[name=privatePwd]").val('');
+                $("small[name='notiOpenY']").css('display', 'none');
+                $("small[name='notiOpenN']").css('display', '');
+
+            } else {
+                $("small[name='notiOpenY']").css('display', '');
+                $("small[name='notiOpenN']").css('display', 'none');
+            }
+        }
+
+        // 임시 저장 전 유효성 체크
+        function checkValidation() {
+            const bracketTitle = $('#bracketTitle').val()
+
+            if("" == bracketTitle) {
+                alert("\uB300\uD68C \uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694.");
+                $('#bracketTitle').focus();
+                return false;
+            } else {
+                if(bracketTitle.length < 3 || getBytes(bracketTitle) > 50) {
+                    alert('대회 제목은 최소 3자리 이상, 최대 50Byte까지 입력해주세요.');
+                    return false;
+                }
+
+                if(!(checkRegExp("nc", bracketTitle) || checkRegExp("sc", bracketTitle))) {
+                    alert('대회 제목에 사용할 수 없는 문자가 있습니다.\n확인 후 다시 입력해주세요.');
+                    return false;
+                }
+            }
+
+            if($('#bracketCode').length == 0 && "" == $('#bracketCode').val()) {
+                alert('대회 코드를 생성해주세요.');
+                $('#bracketCode').focus();
+                return false;
+            }
+
+            // 직접입력이 아닌데 Chrome 자동완성 기능으로 자동세팅 되는 것을 방지
+            const gameCode = $('#gameCode').val();
+            let gameName = $('#gameName').val();
+
+            if("G9999" != gameCode && "" != gameName) {
+                $('input[name=gameName]').val('');
+            }
+
+            if("" == gameCode || ("G9999" == gameCode && "" == gameName)) {
+                alert("\uAC8C\uC784\uC744 \uC120\uD0DD\uD558\uAC70\uB098 \uAC8C\uC784\uBA85\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694.");
+                return false;
+            }
+
+            if("G9999" == gameCode) {
+                if(gameName.length < 1 || gameName.length > 20) {
+                    alert('게임명은 최소 1자리 이상, 최대 20자리까지 입력해주세요.');
+                    return false;
+                }
+
+                if(!checkRegExp("gn", gameName)) {
+                    alert('게임명은 한글, 숫자로만 구성 가능합니다.');
+                    return false;
+                }
+            } else {
+                gameName = $('.selectbox-header').text();
+            }
+            $('input[name=gameName]').val(gameName);
+
+            const adminPwd = $('#adminPwd').val();
+            const confirmAdminPwd = $('#confirmAdminPwd').val();
+
+            if("" == adminPwd) {
+                alert("\uB300\uD68C \uAD00\uB9AC\uC790 \uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.");
+                $('#adminPwd').focus();
+                return false;
+            }
+
+            if(!checkValidationAdminPwd(adminPwd)) {
+                alert('대회 관리자 비밀번호는 영문, 숫자 조합 최대 6자리로 구성해주세요.');
+                $('#adminPwd').focus();
+                return false;
+            }
+
+            if("" == confirmAdminPwd) {
+                alert("\uB300\uD68C \uAD00\uB9AC\uC790 \uBE44\uBC00\uBC88\uD638 \uD655\uC778\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694.");
+                $('#confirmAdminPwd').focus();
+                return false;
+            }
+
+            if($('#confirmAdminPwd').val() != adminPwd) {
+                alert('대회 관리자 비밀번호 확인이 일치하지 않습니다.');
+                $('#confirmAdminPwd').focus();
+                return false;
+            }
+
+            if("N" == $('#openYn').val()) {
+                if(isEmpty($('#privatePwd').val())) {
+                    alert("\uBE44\uACF5\uAC1C \uB300\uD68C \uBE44\uBC00\uBC88\uD638\uB97C \uC785\uB825\uD574\uC8FC\uC138\uC694.");
+                    $('#privatePwd').focus();
+                    return false;
+                } else {
+                    if(!checkValidationPrivatePwd($('#privatePwd').val())) {
+                        alert('비공개 대회 비밀번호는 숫자 6자리로 구성해주세요.');
+                        $('#adminPwd').focus();
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        // 다음단계(현재정보 임시 저장)
+        function goNextStep() {
+            const form = $("form[name=bracketForm]");
+
+            if(!checkValidation())  return false;
+
+            commonAjax('/match/basic', 'post', new FormData(form[0]), function(data) {
+                goStep('/match/recruit', 'GET', data.bracketSeq);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <!DOCTYPE html>
+<html lang="ko">
+
+<script type="text/javascript">
+    // 대회 검색
+    function searchBracket() {
+        const searchForm = $("form[name=searchForm]");
+        const keyword = searchForm.find('input[name=keyword]').val();
+
+        if(!isEmpty(keyword)) {
+            if(!checkRegExp("tot", keyword)) {
+                alert('검색어에 사용할 수 없는 문자가 있습니다.\n확인 후 다시 입력해주세요.');
+                return false;
+            }
+
+            if(keyword.length < 2 || getBytes(keyword) > 50) {
+                alert('최소 2자 이상 50Byte 이하 입력 해주세요.');
+                return false;
+            }
+        }
+
+        searchForm.find("input[name=currentPage]").val(1);
+        searchForm.submit();
+    }
+</script>
+
+<!-- header -->
+
+    <header id="header" class="sub">
+        <div class="inner flex">
+            <h1><a href="/index" class="bi">스마일게이트 PC방 대진표 매니저</a></h1>
+            <!-- gnb -->
+            <nav class="gnb-wrap">
+                <ul class="flex">
+                    <li id="navHome"><a href="/index">홈</a></li>
+                    <li id="navMatch" class="current"><a href="/match/basic">대회 개설</a></li>
+                    <li id="navDraw"><a href="/bracket/main">대회 관리</a></li>
+                    <li class="depth2" id="navCs">
+                        <a href="/cs/notice/list">공지/안내</a>
+                        <ul>
+                            <li id="navNotice"><a href="/cs/notice/list">공지사항</a></li>
+                            <li id="navGuide"><a href="/cs/service/guide">서비스 안내</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+
+            
+                <!-- Search Form : Sub Page -->
+                <div class="gnb-search">
+                    <form name="searchForm" method="post" action="/index" class="d-flex">
+                        <input type="search" class="input-search" placeholder="대회" name="keyword" onkeydown="if(event.keyCode==13) { searchBracket(); return false; }" />
+                        <button type="button" class="btn" onclick="searchBracket();"><i class="ico ico-searchbtn-s">검색</i></button>
+                        <input type="hidden" name="searchType" value="bracketTitle" />
+                        <input type="hidden" name="currentPage" value="" />
+                    </form>
+                </div>
+                <!-- //Search Form : Sub Page -->
+            
+        </div>
+    </header>
+
+<!-- //header -->
+
+        <!-- container -->
+        <div id="container" class="sub">
+            <!-- 상단 안내 배너 : 로그인 페이지 이동 -->
+            <div class="top-banner" data-id="bn-login"><!-- 'top-banner' 공통 클래스 + 개별 attr 값 -->
+                <div class="inner">
+                    <p>개설한 대회가 있다면 대회 코드와 비밀번호를 입력하여 접속해 주세요.</p>
+                    <button type="button" class="btn btnful-default btn-white btn-s" onclick="location.href='/auth/login'"><span><em>개설한 대회 접속하기</em></span></button>
+                    <button type="button" class="ico btn-x" onclick="toggleSlide('close', $(this), $('[data-id=bn-login]'));"><span>닫기</span></button>
+                </div>
+            </div>
+            <!-- //상단 안내 배너 : 로그인 페이지 이동 -->
+
+            <!-- contents -->
+            <div class="contents match"><!-- contents + 페이지 class -->
+                <!-- lnb -->
+<!DOCTYPE html>
+<html lang="ko">
+
+<h2 class="tit">대회 개설</h2>
+<div class="step-area"><!-- declare uri -->
+    <ol class="steps flex">
+        <li class="step1 current">
+            
+            <span>기본 정보</span>
+        </li>
+        <li class="step2">
+            
+            <span>모집 정보</span>
+        </li>
+        <li class="step3">
+            
+            <span>대회 정보</span>
+        </li>
+    </ol>
+</div>
+<!-- //lnb -->
+
+                <h3 class="tit">기본 정보</h3>
+                <div class="tbl-area">
+                    <p class="txt-require">* 필수</p>
+                    <form name="bracketForm">
+                        <input type="hidden" name="bracketSeq" value="0" />
+                        <input type="hidden" name="status" value="" />
+                        <input type="hidden" name="step" value="" />
+
+                        <table class="tbl">
+                            <caption>기본 정보</caption>
+                            <colgroup>
+                                <col width="180px">
+                                <col width="*">
+                            </colgroup>
+                            <tbody>
+                                <!-- 대회 제목 -->
+                                <tr>
+                                    <th scope="col"><label for="bracketTitle" class="require">대회 제목</label></th>
+                                    <td>
+                                        <input type="text" class="" id="bracketTitle" name="bracketTitle" placeholder="대회명 입력" style="width:250px" maxlength="50" onkeyup="checkBytes($(this).val(), $(this).attr('maxlength'), 'bracketTitle', 'bracketTitleBytes');" value="" />
+                                        <sub>(<em id="bracketTitleBytes">0</em>/50 Byte)</sub>
+                                    </td>
+                                </tr>
+                                <!-- //대회 제목 -->
+
+                                <!-- 게임명 -->
+                                <tr>
+                                    <th scope="col"><label for="gameCode" class="require">게임명</label></th>
+                                    <td scope="col">
+                                        <input type="hidden" id="gameCode" name="gameCode" value="G9999" />
+                                        <div class="selectbox" style="width:250px">
+                                            
+                                                <button type="button" class="selectbox-header">선택</button>
+                                            
+                                            
+                                            <div class="selectbox-body">
+                                                <ul id="selectboxGameCode">
+                                                    <li value="G9999" onclick="selectGame($(this));"><button type="button">선택</button></li>
+                                                    <li value="G0001" onclick="selectGame($(this));"><button type="button">테일즈런너</button></li>
+                                                    <li value="G0002" onclick="selectGame($(this));"><button type="button">에픽세븐</button></li>
+                                                    <li value="G0003" onclick="selectGame($(this));"><button type="button">로스트아크</button></li>
+                                                    <li value="G0004" onclick="selectGame($(this));"><button type="button">겟앰프드</button></li>
+                                                    <li value="G0005" onclick="selectGame($(this));"><button type="button">레인보우식스 시즈</button></li>
+                                                    <li value="G0007" onclick="selectGame($(this));"><button type="button">리그 오브 레전드 와일드 리프트</button></li>
+                                                    <li value="G0006" onclick="selectGame($(this));"><button type="button">리그오브레전드</button></li>
+                                                    <li value="G0008" onclick="selectGame($(this));"><button type="button">발로란트</button></li>
+                                                    <li value="G0009" onclick="selectGame($(this));"><button type="button">배틀그라운드</button></li>
+                                                    <li value="G0010" onclick="selectGame($(this));"><button type="button">배틀그라운드 모바일</button></li>
+                                                    <li value="G0011" onclick="selectGame($(this));"><button type="button">서든어택</button></li>
+                                                    <li value="G0012" onclick="selectGame($(this));"><button type="button">스타크래프트</button></li>
+                                                    <li value="G0013" onclick="selectGame($(this));"><button type="button">스타크래프트2</button></li>
+                                                    <li value="G0014" onclick="selectGame($(this));"><button type="button">에이펙스 레전드</button></li>
+                                                    <li value="G0015" onclick="selectGame($(this));"><button type="button">오버워치</button></li>
+                                                    <li value="G0016" onclick="selectGame($(this));"><button type="button">카트라이더</button></li>
+                                                    <li value="G0017" onclick="selectGame($(this));"><button type="button">카트라이더 러쉬플러스</button></li>
+                                                    <li value="G0018" onclick="selectGame($(this));"><button type="button">피파온라인4</button></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <span class="input-gamelist">
+                                            <input type="hidden" name="gameName" value="" />
+                                            <input type="text" id="gameName" placeholder="직접 입력 (한글 풀네임 입력)" style="width:220px" maxlength="20" onkeyup="searchGameName();" value="" />
+                                            <!-- 검색용 게임 목록 -->
+                                            <ul id="searchGameList" class="search-gamelist">
+                                                <li class="item" value="G0001" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">테일즈런너</button>
+                                                </li>
+                                                <li class="item" value="G0002" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">에픽세븐</button>
+                                                </li>
+                                                <li class="item" value="G0003" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">로스트아크</button>
+                                                </li>
+                                                <li class="item" value="G0004" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">겟앰프드</button>
+                                                </li>
+                                                <li class="item" value="G0005" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">레인보우식스 시즈</button>
+                                                </li>
+                                                <li class="item" value="G0007" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">리그 오브 레전드 와일드 리프트</button>
+                                                </li>
+                                                <li class="item" value="G0006" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">리그오브레전드</button>
+                                                </li>
+                                                <li class="item" value="G0008" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">발로란트</button>
+                                                </li>
+                                                <li class="item" value="G0009" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">배틀그라운드</button>
+                                                </li>
+                                                <li class="item" value="G0010" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">배틀그라운드 모바일</button>
+                                                </li>
+                                                <li class="item" value="G0011" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">서든어택</button>
+                                                </li>
+                                                <li class="item" value="G0012" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">스타크래프트</button>
+                                                </li>
+                                                <li class="item" value="G0013" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">스타크래프트2</button>
+                                                </li>
+                                                <li class="item" value="G0014" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">에이펙스 레전드</button>
+                                                </li>
+                                                <li class="item" value="G0015" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">오버워치</button>
+                                                </li>
+                                                <li class="item" value="G0016" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">카트라이더</button>
+                                                </li>
+                                                <li class="item" value="G0017" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">카트라이더 러쉬플러스</button>
+                                                </li>
+                                                <li class="item" value="G0018" onclick="selectGame($(this));">
+                                                    <button type="button" class="name">피파온라인4</button>
+                                                </li>
+                                            </ul>
+                                            <!-- //검색용 게임 목록 -->
+                                        </span>
+                                    </td>
+                                </tr>
+                                <!-- //게임명 -->
+
+                                <!-- 대회 코드(링크) -->
+                                <tr>
+                                    <th scope="col"><label for="bracketCode" class="require">대회 코드(링크)</label></th>
+                                    <td scope="col">
+                                        
+                                            <span>bracket.smilegatemegaport.com/code/</span>
+                                            <input type="text" class="" id="bracketCode" name="bracketCode" value="" readonly style="width:136px">
+                                            <button type="button" class="btn btn-default btn-white btn-s" onclick="makeIdAuto();"><span>재생성</span></button>
+                                            <small><strong class="orange">※ 대회 코드는 추후 대회 관리자 권한으로 접속하거나 대회 검색 등에 활용됨으로 반드시 메모 혹은 숙지하시기 바랍니다.</strong></small>
+                                        
+                                        
+                                    </td>
+                                </tr>
+                                <!-- //대회 코드(링크) -->
+
+                                <!-- 대회 관리자 비밀번호 -->
+                                <tr>
+                                    <th scope="col"><label for="adminPwd" class="require">대회 관리자 비밀번호</label></th>
+                                    <td scope="col">
+                                        <input type="password" class="" id="adminPwd" name="adminPwd" placeholder="비밀번호 입력" style="width:250px" maxlength="10" onkeyup="checkValidationAdminPwd($(this).val());" />
+                                        <sub>영문, 숫자 조합 6자 이상 10자 이하</sub>
+                                        <div class="mar-t5">
+                                            <input type="password" class="" id="confirmAdminPwd" name="confirmAdminPwd" placeholder="비밀번호 확인" style="width:250px" maxlength="10" onkeyup="checkValidationConfirmAdminPwd($(this).val());" />
+                                        </div>
+                                        <small>※ 대회 관리자 비밀번호는 추후 대회 수정 시 대회 코드와 함께 입력해야 합니다. 또한 관리자 본인 외 타인에게 공유되지 않도록 주의해주세요.</small>
+                                    </td>
+                                </tr>
+                                <!-- //대회 관리자 비밀번호 -->
+
+                                <!-- 대회 접근 공개 여부 -->
+                                <tr>
+                                    <th scope="col"><label for="openYn" class="">대회 접근 공개 여부</label></th>
+                                    <td scope="col">
+                                        <input type="hidden" id="openYn" name="openYn" value="" />
+                                        <span class="checker">
+                                            <input type="radio" id="openYnY" name="rdOpenYn" value="Y" onclick="clickOpenYn($(this));" checked="checked" />
+                                            <label for="openYnY"><span>공개</span></label>
+                                        </span>
+                                        <span class="checker">
+                                            <input type="radio" id="openYnN" name="rdOpenYn" value="N" onclick="clickOpenYn($(this));" />
+                                            <label for="openYnN"><span>비공개</span></label>
+                                            <span class="is-none">
+                                                <input type="password" class="" id="privatePwd" name="privatePwd" placeholder="비밀번호 입력" style="width:136px" value="" maxlength="6" onkeyup="checkValidationPrivatePwd($(this).val());" />
+                                                <sub>숫자 6자리</sub>
+                                            </span>
+                                        </span>
+                                        <small class="text-result" name="notiOpenY">※  공개 시 개설한 대회가 홈 화면에 노출 됩니다.</small>
+                                        <small class="text-result" name="notiOpenN" style="display: none;">※ 비공개 시 개설한 대회는 홈 화면에 미노출 되며, 참가자가 대회 페이지 접근 시 비밀번호를 입력 후 접근할 수 있습니다.</small>
+                                    </td>
+                                </tr>
+                                <!-- //대회 접근 공개 여부 -->
+                            </tbody>
+                        </table>
+
+                        <!-- 취소, 다음단계 -->
+                        <div class="btn-area">
+                            <button type="button" class="btn btn-default btn-gray" onclick="location.href='/'"><span>취소</span></button>
+                            <button type="button" class="btn btn-default" onclick="goNextStep();"><span>다음 단계</span></button>
+                        </div>
+                        <!-- //취소, 다음단계 -->
+                    </form>
+                </div>
+            </div>
+            <!-- //contents -->
+        </div>
+        <!-- //container -->
+
+        <!DOCTYPE html>
+<html lang="ko">
+
+<!-- footer -->
+<footer id="footer">
+    <p class="inner">
+        대진표 매니저는 스마일게이트홀딩스에서 무상으로 지원되고 있는 서비스 입니다.
+        <br>대회 참가 및 운영 관련 문의는 대회 개최자 및 관리자에게 문의하여 주세요.
+        <br>대회 개설 및 대진표 생성 기능 관련 문의는 <span onclick="location.href='mailto:sgpcb@smilegate.com'">sgpcb@smilegate.com</span>으로 문의하여 주세요.
+    </p>
+    <p class="copyright">
+        <span>&copy; Smilegate. All Rights Reserved.</span>
+    </p>
+</footer>
+<!-- //footer -->
+    </div>
+</body>
+</html>
